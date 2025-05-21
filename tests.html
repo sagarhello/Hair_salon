@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salon App Tests</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        #testResults { border: 1px solid #ccc; padding: 10px; }
+        .pass { color: green; }
+        .fail { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Salon App Test Results</h1>
+    <div id="testResults"></div>
+    <script>
+        const testResultsDiv = document.getElementById('testResults');
+
+        function logResult(testName, status, message = '') {
+            const resultP = document.createElement('p');
+            resultP.textContent = `${testName}: ${status}`;
+            if (message) {
+                resultP.textContent += ` - ${message}`;
+            }
+            resultP.className = status.toLowerCase();
+            testResultsDiv.appendChild(resultP);
+        }
+
+        // Test Admin Login Logic
+        function testAdminLogin() {
+            const testName = "Admin Login Logic";
+            // Logic from admin.html (hardcoded credentials)
+            const correctUsername = 'admin';
+            const correctPassword = 'password';
+
+            let allTestsPassed = true;
+            let testMessages = [];
+
+            // Test case 1: Correct credentials
+            if (!(correctUsername === 'admin' && correctPassword === 'password')) {
+                allTestsPassed = false;
+                testMessages.push("FAIL - Correct credentials not recognized.");
+            }
+
+            // Test case 2: Incorrect username
+            if ('wronguser' === correctUsername && 'password' === correctPassword) {
+                allTestsPassed = false;
+                testMessages.push("FAIL - Incorrect username accepted.");
+            }
+
+            // Test case 3: Incorrect password
+            if ('admin' === correctUsername && 'wrongpass' === correctPassword) {
+                allTestsPassed = false;
+                testMessages.push("FAIL - Incorrect password accepted.");
+            }
+            
+            // Test case 4: Empty username
+            if ('' === correctUsername && 'password' === correctPassword) {
+                allTestsPassed = false;
+                testMessages.push("FAIL - Empty username accepted.");
+            }
+
+            // Test case 5: Empty password
+            if ('admin' === correctUsername && '' === correctPassword) {
+                allTestsPassed = false;
+                testMessages.push("FAIL - Empty password accepted.");
+            }
+
+            // Test case 6: Both empty
+            if ('' === correctUsername && '' === correctPassword) {
+                allTestsPassed = false;
+                testMessages.push("FAIL - Both empty username and password accepted.");
+            }
+
+            // Simulate the check
+            function checkCredentials(username, password) {
+                return username === correctUsername && password === correctPassword;
+            }
+
+            if (!checkCredentials('admin', 'password')) {
+                 allTestsPassed = false;
+                 testMessages.push("Sub-Test 1 (Correct): Expected true, got false.");
+            }
+            if (checkCredentials('wronguser', 'password')) {
+                 allTestsPassed = false;
+                 testMessages.push("Sub-Test 2 (Incorrect User): Expected false, got true.");
+            }
+            if (checkCredentials('admin', 'wrongpass')) {
+                 allTestsPassed = false;
+                 testMessages.push("Sub-Test 3 (Incorrect Pass): Expected false, got true.");
+            }
+            if (checkCredentials('', 'password')) {
+                 allTestsPassed = false;
+                 testMessages.push("Sub-Test 4 (Empty User): Expected false, got true.");
+            }
+             if (checkCredentials('admin', '')) {
+                 allTestsPassed = false;
+                 testMessages.push("Sub-Test 5 (Empty Pass): Expected false, got true.");
+            }
+            if (checkCredentials('', '')) {
+                 allTestsPassed = false;
+                 testMessages.push("Sub-Test 6 (Both Empty): Expected false, got true.");
+            }
+
+
+            if (allTestsPassed && testMessages.length === 0) {
+                logResult(testName, "PASS");
+            } else {
+                logResult(testName, "FAIL", testMessages.join(" "));
+            }
+        }
+
+        // Test LocalStorage Functionality
+        function testLocalStorage() {
+            const testName = "LocalStorage Functionality";
+            const testKey = 'testSalonEntries';
+            let allTestsPassed = true;
+            let testMessages = [];
+
+            try {
+                // Clear localStorage for the test key before starting
+                localStorage.removeItem(testKey);
+
+                // Simulate adding entries
+                const entriesToAdd = [
+                    { name: 'Test Customer 1', amount: 10 },
+                    { name: 'Test Customer 2', amount: 25.50 }
+                ];
+                localStorage.setItem(testKey, JSON.stringify(entriesToAdd));
+
+                // Retrieve the entries
+                const retrievedEntriesString = localStorage.getItem(testKey);
+                if (!retrievedEntriesString) {
+                    allTestsPassed = false;
+                    testMessages.push("Data not found after saving.");
+                } else {
+                    const retrievedEntries = JSON.parse(retrievedEntriesString);
+
+                    // Assert data stored and retrieved is correct
+                    if (retrievedEntries.length !== entriesToAdd.length) {
+                        allTestsPassed = false;
+                        testMessages.push(`Expected ${entriesToAdd.length} entries, got ${retrievedEntries.length}.`);
+                    } else {
+                        for (let i = 0; i < entriesToAdd.length; i++) {
+                            if (retrievedEntries[i].name !== entriesToAdd[i].name || retrievedEntries[i].amount !== entriesToAdd[i].amount) {
+                                allTestsPassed = false;
+                                testMessages.push(`Data mismatch at index ${i}. Expected ${JSON.stringify(entriesToAdd[i])}, got ${JSON.stringify(retrievedEntries[i])}.`);
+                                break;
+                            }
+                        }
+                    }
+                }
+            } catch (e) {
+                allTestsPassed = false;
+                testMessages.push(`An error occurred: ${e.message}`);
+            } finally {
+                // Clean up by removing the test key
+                localStorage.removeItem(testKey);
+            }
+
+            if (allTestsPassed && testMessages.length === 0) {
+                logResult(testName, "PASS");
+            } else {
+                logResult(testName, "FAIL", testMessages.join(" "));
+            }
+        }
+
+        // Run Tests when the page loads
+        window.onload = function() {
+            testAdminLogin();
+            testLocalStorage();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hair Salon - Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Admin Dashboard</h1>
+    <section id="add-customer">
+        <h2>Add Customer</h2>
+        <form id="addCustomerForm">
+            <div>
+                <label for="customerName">Customer Name:</label>
+                <input type="text" id="customerName" name="customerName">
+            </div>
+            <div>
+                <label for="amountReceived">Amount Received:</label>
+                <input type="number" id="amountReceived" name="amountReceived">
+            </div>
+            <button type="submit">Add Entry</button>
+        </form>
+    </section>
+    <section id="customer-list">
+        <h2>Customer List</h2>
+        <div id="customerEntries"></div>
+    </section>
+    <script>
+        const addCustomerForm = document.getElementById('addCustomerForm');
+        const customerNameInput = document.getElementById('customerName');
+        const amountReceivedInput = document.getElementById('amountReceived');
+        const customerEntriesDiv = document.getElementById('customerEntries');
+        const localStorageKey = 'salonEntries';
+
+        function displayEntries() {
+            customerEntriesDiv.innerHTML = ''; // Clear the display area
+            const entriesString = localStorage.getItem(localStorageKey);
+            const entries = entriesString ? JSON.parse(entriesString) : [];
+
+            if (entries.length === 0) {
+                customerEntriesDiv.innerHTML = '<p>No entries yet.</p>';
+                return;
+            }
+
+            const ul = document.createElement('ul');
+            entries.forEach(entry => {
+                const li = document.createElement('li');
+                li.textContent = `${entry.name} - $${entry.amount}`;
+                ul.appendChild(li);
+            });
+            customerEntriesDiv.appendChild(ul);
+        }
+
+        addCustomerForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const customerName = customerNameInput.value.trim();
+            const amountReceived = parseFloat(amountReceivedInput.value);
+
+            if (customerName === '' || isNaN(amountReceived)) {
+                alert('Please enter valid customer name and amount.');
+                return;
+            }
+
+            const entriesString = localStorage.getItem(localStorageKey);
+            const entries = entriesString ? JSON.parse(entriesString) : [];
+
+            entries.push({ name: customerName, amount: amountReceived });
+            localStorage.setItem(localStorageKey, JSON.stringify(entries));
+
+            displayEntries();
+
+            // Clear input fields
+            customerNameInput.value = '';
+            amountReceivedInput.value = '';
+        });
+
+        // Initial display of entries when the page loads
+        displayEntries();
+    </script>
+</body>
+</html>
