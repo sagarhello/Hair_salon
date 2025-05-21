@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hair Salon - Home</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Hairdresser Status</h1>
+        <p>Hairdresser: Available</p>
+        <h1>Waiting Time</h1>
+        <p>Estimated Wait: 15 minutes</p>
+    </div>
+    <script>
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey && (event.key === 'a' || event.key === 'A')) {
+                event.preventDefault();
+                window.location.href = 'admin.html';
+            }
+        });
+    </script>
+</body>
+</html>
